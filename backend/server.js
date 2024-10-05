@@ -14,7 +14,8 @@ const EXCHANGES = {
   COINMARKETCAP: 'CoinMarketCap',
   COINGECKO: 'CoinGecko',
   CRYPTOCOMPARE: 'CryptoCompare',
-  BITFINEX: 'Bitfinex'
+  BITFINEX: 'Bitfinex',
+  HUOBI: 'Huobi'
 };
 
 const getPrice = async (exchange, symbol) => {
@@ -41,8 +42,11 @@ const getPrice = async (exchange, symbol) => {
         response = await axios.get(`https://min-api.cryptocompare.com/data/price?fsym=${symbol.slice(0, 3)}&tsyms=USD`);
         return response.data.USD;
       case EXCHANGES.BITFINEX:
-        response = await axios.get(`https://api.bitfinex.com/v1/pubticker/${symbol}`);
+        response = await axios.get(`https://api.bitfinex.com/v1/pubticker/${symbol.toLowerCase()}`);
         return parseFloat(response.data.last_price);
+      case EXCHANGES.HUOBI:
+        response = await axios.get(`https://api.huobi.pro/market/detail/merged?symbol=${symbol.toLowerCase()}`);
+        return parseFloat(response.data.tick.close);
       default:
         throw new Error(`Unsupported exchange: ${exchange}`);
     }
@@ -73,3 +77,4 @@ app.get('/arbitrage', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
